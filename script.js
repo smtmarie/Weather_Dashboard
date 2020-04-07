@@ -15,8 +15,8 @@ $(document).ready(function () {
     })
     function makeRow(text) {
 
-        //additional block of code
-
+       var li = $("<li>").addClass("list-group-item list-group-item-action").text(text);
+       $(".history").append(li);
 
     }
 
@@ -59,6 +59,9 @@ $(document).ready(function () {
         })
     }
 })
+
+
+
 
 
 
