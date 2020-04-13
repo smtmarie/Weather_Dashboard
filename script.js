@@ -1,6 +1,8 @@
 
 $(document).ready(function () {
 
+    var history = JSON.parse(window.localStorage.getItem("history")) || [];
+
     $("#search-btn").on("click", function () {
 
         var searchValue = $("#search-value").val()
@@ -24,7 +26,7 @@ $(document).ready(function () {
 
         var apiKey = "5c3cb19ef5f06279a16d3fc2040aef07";
 
-        var queryUrl = "http://api.openweathermap.org/data/2.5/weather?q="+searchValue + "&appid="+apiKey+"&units=imperial";
+        var queryUrl = "https://api.openweathermap.org/data/2.5/weather?q="+searchValue + "&appid="+apiKey+"&units=imperial";
 
         $.ajax({
 
@@ -36,7 +38,7 @@ $(document).ready(function () {
 
                     history.push(searchValue)
 
-                    window.LocalStorage.setItem("history", JSON.stringify(history))
+                    window.localStorage.setItem("history", JSON.stringify(history))
 
                     makeRow(searchValue)
                 }
@@ -44,8 +46,8 @@ $(document).ready(function () {
 
                 var card = $("<div>").addClass("card");
                 var wind = $("<p>").addClass("card-text").text("Wind Speed: " + response.wind.speed + " MPH");
-                var humid = $("<p>").addClass("card-text").text("Humidity: " + response.main.hmidity + " MPH");
-                var temp = $("<p>").addClass("card-text").text("Temperature: " + response.main.temp + " MPH");
+                var humid = $("<p>").addClass("card-text").text("Humidity: " + response.main.humidity + " %");
+                var temp = $("<p>").addClass("card-text").text("Temperature: " + response.main.temp + " degrees");
                 var cardBody = $("<div>").addClass("card-body");
 
                 cardBody.append(temp, humid, wind);
@@ -58,156 +60,54 @@ $(document).ready(function () {
             }
         })
     }
+
+    function getForecast(searchValue) {
+
+        var apiKey = "5c3cb19ef5f06279a16d3fc2040aef07";
+
+        var queryUrl = "https://api.openweathermap.org/data/2.5/forecast?q="+searchValue + "&appid="+apiKey+"&units=imperial";
+
+        $.ajax({
+
+            type: "GET",
+            url: queryUrl,
+            dataType: "JSON", success: function (response) {
+
+            $("#forecast").html("<h4 class=\"mt-3\">5-Day Forecast:</h4").append("<div class=\"row\">")
+
+
+            for(var i=0; i< response.list.length; i++) {
+
+                if (response.list[i].dt_txt.indexOf("15:00:00") !== -1)
+
+                {
+
+                    var col = $("<div>").addClass("col-md-2")
+                    var card = $("<div>").addClass("card bg-primary text-white")
+                    var body = $("<div>").addClass("card-body p-2")
+                    var p1= $("<p>").addClass("card-text").text("Temperature " + response.list[i].main.temp_max)
+                    var p2= $("<p>").addClass("card-text").text("Humidity " + response.list[i].main.humidity)
+                   
+
+                    col.append(card.append(body.append(p1, p2)))
+
+                    $("#forecast .row").append(col)
+
+                }
+            }
+
+            }
+
+
+        })
+    }
+
+
+
+
 })
 
 
 
 
 
-
-
-
-                // var temp = response.main.temp;
-                // var windSpeed = response.wind.speed;
-                // var humidity = response.main.humidity;
-                // var cityDiv = $("<div class='city'>");
-                // var header = $("<h4>").text(city);
-                // var pOne = $("<p>").text("Temp: " + temp + String.fromCharCode(176) + "F");
-                // var pTwo = $("<p>").text("Wind Speed: " + windSpeed + "mph");
-                // var pThree = $("<p>").text("Humidity: " + humidity + "%");
-
-                // var uvSpan = $("<span>").text(uvResponse.value).css("color", color);
-                // var pFour = $("<p>").text("UV Index: ").append(uvSpan);
-                // cityDiv.append(header, pOne, pTwo, pThree, pFour);
-
-    //         }
-
-    //     })
-
-
-    // }
-
-        // function getForecast(searchValue) {
-
-        //     $.ajax({
-
-        //         type: "GET",
-        //         url: queryUrl,
-        //         dataType: "JSON", success: function (response) {
-
-        //         if 
-
-        // }
-
-
-
-
-//         var forecast = [];
-
-//         var cities = $(this).attr("city");
-
-//         var apiKey = "5c3cb19ef5f06279a16d3fc2040aef07";
-
-//         var lat = "latitude";
-
-//         var lon = "longitude";
-
-//         var uvIndex = (lat + lon);
-
-//        
-
-//         cities.forEach(function (city, index, cities) {
-
-//             renderButton(city);
-
-//             if (index === cities.length - 1) {
-
-//                 displayWeatherInfo(city);
-//             }
-//         })
-
-//         function displayWeatherInfo(city) {
-
-//             var queryUrl = "http://api.openweathermap.org/data/2.5/weather?q={city name},{state}&appid={api key}&units=imperial";
-
-//             $.ajax(queryUrl).then(function (response) {
-
-//                 var lon = response.coord.lon;
-//                 var lat = response.coord.lat;
-//                 var queryUV = 'http://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api key}';
-
-//                 $.ajax(queryUV).then(function (uvResponse) {
-
-//                     console.log(uvResponse)
-
-//                     var temp = response.main.temp;
-//                     var windSpeed = response.wind.speed;
-//                     var humidity = response.main.humidity;
-//                     var cityDiv = $("<div class='city'>");
-//                     var header = $("<h4>").text(city);
-//                     var pOne = $("<p>").text("Temp: " + temp + String.fromCharCode(176) + "F");
-//                     var pTwo = $("<p>").text("Wind Speed: " + windSpeed + "mph");
-//                     var pThree = $("<p>").text("Humidity: " + humidity + "%");
-
-//                     var uvSpan = $("<span>").text(uvResponse.value).css("color", color);
-//                     var pFour = $("<p>").text("UV Index: ").append(uvSpan);
-//                     cityDiv.append(header, pOne, pTwo, pThree, pFour);
-
-//                     var forecastTemp = data.list[i].main.temp;
-//                     var forecastHumidity = data.list[i].main.humidity;
-
-//                 $("#Five-Day-Forecast").text(FiveDayForecast);
-
-//                 var oneDayForward = new moment().add(1, 'day');
-//                 var twoDayForward = new moment().add(1, 'day');
-//                 var threeDayForward = new moment().add(1, 'day');
-//                 var fourDayForward = new moment().add(1, 'day');
-//                 var fiveDayForward = new moment().add(1, 'day');
-
-//                 $("#day1-date").text(oneDayForward.format('dddd MMMM DD'));
-//                 $("#day2-date").text(twoDayForward.format('dddd MMMM DD'));
-//                 $("#day3-date").text(threeDayForward.format('dddd MMMM DD'));
-//                 $("#day4-date").text(fourDayForward.format('dddd MMMM DD'));
-//                 $("#day5-date").text(fiveDayForward.format('dddd MMMM DD'));
-
-//                 $("#weather-view").empty();
-//                 $("#weather-view").prepend(cityDiv);
-
-//             })
-
-//         })
-
-// }
-
-// function renderButton(city) {
-
-//     var btn = $("<button>");
-//     btn.addClass("city-btn btn btn-default").css("display", "block");
-//     btn.attr("data-name", city);
-//     btn.text(city);
-//     $(".cities-array").append(btn);
-
-// }
-
-// $("#searchBtn").on("click", function (event) {
-
-//     evvent.preventDefault();
-
-//     var $weather = $("#city-input").val();
-
-//     cities.push($weather);
-
-//     localStorage.setItem("weather", JSON.stringify(cities));
-
-//     renderButton($weather);
-
-//     displayWeatherInfo($weather);
-
-// });
-
-// $(document).on("click", ".city-btn", function () {
-
-//     var city = $(this).attr("data-name");
-//     displayWeatherInfo(city);
-
-// });
